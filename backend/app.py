@@ -7,20 +7,18 @@ from functools import wraps    # PARA PRESERVAR METADADOS DE FUNÇÕES DECORADAS
 from dotenv import load_dotenv
 import os
 
-# Carrega variáveis de ambiente (.env)
+
 load_dotenv()
 
 app = Flask(__name__)
 
-# Configurações principais
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configuração do JWT (expira em 24 horas)
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=24)
 
-# Configurações de upload de arquivos (caso precise futuramente)
+# Configurações de upload de arquivos 
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static/uploads')
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'png', 'jpg', 'jpeg', 'docx'}
@@ -28,9 +26,6 @@ app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'png', 'jpg', 'jpeg', 'docx'}
 db = SQLAlchemy(app)
 
 
-# ======================
-# MODELS
-# ======================
 
 class Doctor(db.Model):
     """Modelo de tabela de médicos."""
@@ -74,9 +69,6 @@ class MedicalRecord(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
-# ======================
-# DECORATOR DE AUTENTICAÇÃO
-# ======================
 
 def token_required(f):
     """Decorator para verificar token JWT em rotas protegidas."""
@@ -103,8 +95,6 @@ def token_required(f):
     return decorated
 
 
-
-# ROTAS
 
 
 @app.route('/', defaults={'path': ''})
@@ -240,7 +230,7 @@ def get_patients(current_doctor):
 
 
 if __name__ == '__main__':
-    # Cria as tabelas (drop_all apenas para desenvolvimento!
+    # Cria as tabelas (drop_all apenas para desenvolvimento
     with app.app_context():
         try:
             db.drop_all()
